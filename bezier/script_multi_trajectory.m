@@ -1,6 +1,6 @@
 %% test multi ee, make data
 clear;
-m  = 100;% point num
+m  = 10;% point num
 n  = 5; % ee num
 
 v0 = zeros(1,n);
@@ -60,32 +60,32 @@ if(max(max(a)) > max(max(acc)) + 1e-7)
 end
 
 %%
-% % for j=1:n
-%     subplot(1,4,1);
-%     plot(t,p);
-% %     axis equal
-%     for i=1:m
-%         line([sum(T(1:i)) sum(T(1:i))],[0 1.1*max(pos(end,:))],'linestyle','--', 'Color','k');
-%     end
-%     subplot(1,4,2);
-%     plot(t(2:end)-dt/2,v);
-% %     axis equal
-%     for i=1:m
-%         line([sum(T(1:i)) sum(T(1:i))],[-1.1*max(vel(end,:)) 1.1*max(vel(end,:))],'linestyle','--', 'Color','k');
-%     end
-% 
-%     subplot(1,4,3);
-%     plot(t(3:end)-dt/2*3,a);
-% %     axis equal
-%     for i=1:m
-% %         line([sum(T(1:i)) sum(T(1:i))],[-1.1*max(acc(end,:)) 1.1*max(acc(end,:))],'linestyle',':', 'Color','k');
-%     end
-% 
-%     subplot(1,4,4);
-%     plot(t(4:end)-dt/2*5,j);
-% %     axis equal
-%     for i=1:m
+% for j=1:n
+    subplot(1,4,1);
+    plot(t,p);
+%     axis equal
+    for i=1:m
+        line([sum(T(1:i)) sum(T(1:i))],[0 1.1*max(pos(end,:))],'linestyle','--', 'Color','k');
+    end
+    subplot(1,4,2);
+    plot(t(2:end)-dt/2,v);
+%     axis equal
+    for i=1:m
+        line([sum(T(1:i)) sum(T(1:i))],[-1.1*max(vel(end,:)) 1.1*max(vel(end,:))],'linestyle','--', 'Color','k');
+    end
+
+    subplot(1,4,3);
+    plot(t(3:end)-dt/2*3,a);
+%     axis equal
+    for i=1:m
 %         line([sum(T(1:i)) sum(T(1:i))],[-1.1*max(acc(end,:)) 1.1*max(acc(end,:))],'linestyle',':', 'Color','k');
-%     end
-% % end
+    end
+
+    subplot(1,4,4);
+    plot(t(4:end)-dt/2*5,j);
+%     axis equal
+    for i=1:m
+        line([sum(T(1:i)) sum(T(1:i))],[-1.1*max(acc(end,:)) 1.1*max(acc(end,:))],'linestyle',':', 'Color','k');
+    end
+% end
 

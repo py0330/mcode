@@ -989,11 +989,88 @@ s_curve_length(va2,vb2,v2,a2,j2,T2)
 
 %%
 clear
-syms va Ta j a T
+syms va Ta j a T pt
 eq = (va + j*Ta*Ta/8)*Ta...
         + sqrt(4*va/j + Ta*Ta)*(va + j*Ta*Ta/4)/2 ...
         + (T - Ta - sqrt(4*va/j + Ta*Ta))*(va + j*Ta*Ta/4)
 
+(va + j*Ta*Ta/8)*Ta...
+            + sqrt(4*va/j + Ta*Ta)*(va + j*Ta*Ta/4)/2 ...
+            + (T - Ta - sqrt(4*va/j + Ta*Ta))*(va + j*Ta*Ta/4) - pt
+
 expand(eq)
 
 expand(T*va - (Ta^3*j)/8 - (va/2 + Ta^2*j/8)*(Ta^2 + (4*va)/j)^(1/2) + (T*Ta^2*j)/4 -eq)
+
+
+
+
+va = 0;
+vb = 0;
+% vc = 
+% T=1.1128874161511026;
+T=500.50581926029304;
+a=50;
+j=50;
+pt = 1.9687164710040281;
+% Ta = newton_raphson_binary_search(@(Ta)(...
+%             (va + j*Ta*Ta/8)*Ta...
+%             + sqrt(4*va/j + Ta*Ta)*(va + j*Ta*Ta/4)/2 ...
+%             + (T - Ta - sqrt(4*va/j + Ta*Ta))*(va + j*Ta*Ta/4) - pt)...
+%             ,0,2.0,10*eps)
+
+Ta = newton_raphson_binary_search(@(Ta)(...
+        T*va - (Ta^3*j)/8 ...
+        - (va/2 + Ta^2*j/8)*(Ta^2 + 4*va/j)^(1/2) ...
+        + (T*Ta^2*j)/4 - pt)...
+            ,0,2.0,10*eps)
+
+syms va j Ta pt T g(Ta)
+g(Ta,j,va,T,pt) = T*va - (Ta^3*j)/8 ...
+        - (va/2 + Ta^2*j/8)*(Ta^2 + 4*va/j)^(1/2) ...
+        + (T*Ta^2*j)/4 - pt;
+
+g(2,50,0,500,2.0)
+%%
+clear
+syms va j Ta pt T f(Ta)
+v  = va + j*Ta*Ta/4
+la = (v+va)/2*Ta
+Tb = sqrt(4*va/j + Ta*Ta)
+lb = Tb*v/2
+lc = (T - Ta - Tb)*v
+
+l = la+lb+lc - pt
+
+expand(l)
+
+f(Ta,j,va,T,pt) = l
+
+f(100,50,0,500,2.0)
+
+% Ta = newton_raphson_binary_search(@(Ta)(...
+%             (va + j*Ta*Ta/8)*Ta...
+%             + sqrt(4*va/j + Ta*Ta)*(va + j*Ta*Ta/4)/2 ...
+%             + (T - Ta - sqrt(4*va/j + Ta*Ta))*(va + j*Ta*Ta/4) - pt)...
+%             ,0,2.0,10*eps)
+% 
+% 
+% Ta = newton_raphson_binary_search(@(Ta)(...
+%             (va + j*Ta*Ta/8)*Ta...
+%             + sqrt(4*va/j + Ta*Ta)*(va + j*Ta*Ta/4)/2 ...
+%             + (T - Ta - sqrt(4*va/j + Ta*Ta))*(va + j*Ta*Ta/4) - pt)...
+%             ,0,2.0 ...
+%             ,10*eps)
+
+
+%%
+clear;
+syms va j a Ta T pt
+
+v  = va + j*Ta*Ta/4
+la = j/8*Ta^3 + va*Ta
+Tb = T-Ta
+vb = v  - j*Tb*Tb/4
+lb = Tb*(v+vb)/2
+
+expand(la + lb - pt)

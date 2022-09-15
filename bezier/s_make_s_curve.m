@@ -34,7 +34,7 @@ function [vb, vc, Ta, Tb, mode] = s_make_s_curve(pa, va, pb, vc_max, a, j, T)
 %                \          
 %                   \        
 %                      ------- vb
-%  |<- Tb ->|<- Ta ->|<- Tc ->|
+%  |<- Ta ->|<- Tc ->|<- Tb ->|
 % 此时，轨迹仅有1段降速过程，即从va降速到vb，
 % 但在va和vb处，会各有一段匀速过程
 % 这两段匀速过程持续的时间 按va-v 和 vb-v的比例来决定
@@ -42,7 +42,10 @@ function [vb, vc, Ta, Tb, mode] = s_make_s_curve(pa, va, pb, vc_max, a, j, T)
 % 
 cons = 100*eps;
 
-% a2_j = a^2/j;
+va = max(va,0);
+
+Z1 = a^2/j;
+Z2 = T^2*j;
 
 pt = pb - pa;
 T_va_to_max_v = s_acc_time(va, vc_max, a, j);
@@ -140,11 +143,11 @@ end
 %               ,(T^4*j^2 + 8*T^2*j*va + 16*va^2)/(16*T^2*j)
 %               ,(j*T^2)/8 + va/2)
 % v_below = va
-v_upper = min([vc_max, a^2/j, (T^4*j^2 + 8*T^2*j*va + 16*va^2)/(16*T^2*j),(j*T^2)/8 + va/2]);
+v_upper = min([vc_max, Z1, (Z2^2 + 8*Z2*va + 16*va^2)/(16*Z2),Z2/8 + va/2]);
 v_below = va;
 l = -1;
-if(v_below <= v_upper)
-    vc = min([vc_max, a^2/j, (T^4*j^2 + 8*T^2*j*va + 16*va^2)/(16*T^2*j)]);
+if(v_upper >= v_below)
+    vc = v_upper;
     Ta = s_acc_time(va,vc,a,j);
     Tb = s_acc_time(0, vc,a,j);
     Tc = T - Ta - Tb;
@@ -160,10 +163,9 @@ if(pt < l)
     %
     % l = la+lb+lc
     %   = la + T*v - Ta*v -Tb*v/2
-    va = max(va,0);
     Ta = newton_raphson_binary_search(@(Ta)(...
         T*va - (Ta^3*j)/8 ...
-        - (va/2 + Ta^2*j/8)*(Ta^2 + (4*va)/j)^(1/2) ...
+        - (va/2 + Ta^2*j/8)*(Ta^2 + 4*va/j)^(1/2) ...
         + (T*Ta^2*j)/4 - pt)...
         ,0,min([s_acc_time(va,vc,a,j),T/2,T-s_acc_time(0,va,a,j)])...
         ,10*eps);
@@ -212,12 +214,12 @@ end
 %
 % v_upper = min(x1, va + a^2/j, max_v, T*a-a^2/j)
 % v_below = a^2/j
-k1 = 2*(T*a + a^2/j);
-k0 = -a^2*((4*va)/j + T^2 + a^2/j^2 - (2*T*a)/j);
+k1 = 2*(T*a + Z1);
+k0 = -a^2*((4*va)/j + T^2 + Z1/j - (2*T*a)/j);
 x1 = (k1-sqrt(k1*k1+4*k0))/2;% k0为-1
 
-v_upper = min([x1, va + a^2/j, vc_max, T*a-a^2/j]);
-v_below = max(a^2/j, va);
+v_upper = min([x1, va + Z1, vc_max, T*a-Z1]);
+v_below = max(Z1, va);
 
 if(v_upper < v_below)
     l=-1;
@@ -297,7 +299,7 @@ if(pt < l)
     % return
     vc  = va + j*Ta*Ta/4;
     vb = 0;
-    Tb = (vc + a^2/j)/a;
+    Tb = (vc + Z1)/a;
     mode = 0;
     % error
     if(abs(s_curve_length(va, 0, vc, a, j, T) - pt) > 1e-10)
@@ -325,8 +327,8 @@ end
 %
 % v_upper = min(max_v, - a^2/j + (T*a)/2 + va/2)
 % v_below = va + a^2/j
-v_upper = min(vc_max, - a^2/j + (T*a)/2 + va/2);
-v_below = va + a^2/j;
+v_upper = min(vc_max, - Z1 + (T*a)/2 + va/2);
+v_below = va + Z1;
 l = -1;
 if(v_below <= v_upper)
     vc = v_upper;
@@ -353,15 +355,15 @@ if(pt < l)
     % k0 = (T - va/a)*(va - a^2/j) + (va*(va - a^2/j))/(2*a)- pt
     
     k2 = -a;
-    k1 = (a*(T - va/a) + a^2/j);
-    k0 = (T - va/a)*(va - a^2/j) + (va*(va - a^2/j))/(2*a)- pt;
+    k1 = (a*T - va + Z1);
+    k0 = (va - Z1)*(T - va/a/2)- pt;
 
     Ta = (-k1 + sqrt(k1*k1 - 4*k0*k2))/(2*k2);
 
     % return
-    vc  = va + Ta*a - a^2/j;
+    vc  = va + Ta*a - Z1;
     vb = 0;
-    Tb = (vc + a^2/j)/a;
+    Tb = (vc + Z1)/a;
     mode = 0;
     % error
     if(abs(s_curve_length(va, 0, vc, a, j, T) - pt) > 1e-10)
@@ -389,13 +391,13 @@ end
 % 条件 B.3 可得 Ta <= T_va_to_max_v
 % 条件 B.4 可得 Ta >= 0  (包含在B.2中)
 Ta_upper = min([T_va_to_max_v, 2*a/j, T - 2*a/j]);
-Ta_below = 2*sqrt(max(0, a^2/j - va)/j);
+Ta_below = 2*sqrt(max(0, Z1 - va)/j);
 if(Ta_upper >= Ta_below)
     Ta = Ta_upper;
     vc  = va + j*Ta*Ta/4;
     la = Ta*(vc+va)/2;
     Tb = T-Ta;
-    vb = vc - Tb*a + a^2/j;
+    vb = vc - Tb*a + Z1;
     lb = Tb*(vc+vb)/2;
     l = la + lb;
 end
@@ -429,8 +431,8 @@ if(pt < l)
     %   l3 = la + lb  
     k3 = - j/8;
     k2 = (T*j)/4 - a/2;
-    k1 = - a^2/(2*j) + T*a;
-    k0 = (T*(a^2/j - T*a + 2*va))/2 - pt;
+    k1 = - Z1/2 + T*a;
+    k0 = (T*(Z1 - T*a + 2*va))/2 - pt;
     
     % 选根
     % syms f(Ta) g(Ta)
@@ -459,6 +461,90 @@ if(pt < l)
     return;
 end
 
+% ------------------ l8 -------------------- 
+% vb不为0，达不到max_v，a段可达到最大加速度，b段可达到最大加速度
+Ta_upper = min([T_va_to_max_v, T - 2*a/j]);
+Ta_below = 2*a/j;
+l=-1;
+if(Ta_upper >= Ta_below)
+    Ta = Ta_upper;
+    vc  = va + Ta*a - Z1;
+    la = (va + vc)*Ta/2;
+    Tb = T-Ta;
+    vb = s_acc_vend(vc,-a,-j,Tb);
+    lb = Tb*(vc+vb)/2;
+    l  = la + lb;
+end
+if(pt < l + cons)
+    % syms va T a j pt Ta
+    % v  = va + Ta*a - a^2/j
+    % la = Ta*(va + v)/2
+    % Tb = T-Ta
+    % vb = v - Tb*a + a^2/j;
+    % lb = Tb*(v+vb)/2
+    %
+    % 根据 la + lb = pt，有：
+    % collect(la+lb-pt,Ta)
+    % - a*Ta^2 + 2*T*a*Ta - pt - (T*(T*a - 2*va + a^2/j))/2
+    %
+    % 可得方程系数
+    k2 = -a;
+    k1 = 2*T*a;
+    k0 = - pt - (T*(Z1 + T*a - 2*va))/2;
+
+    % 选根
+    % 其极值为：
+    % r = k1 / (2*k2) = T
+    % 应有 Ta < T
+    % 故而选其较小的根
+    Ta = (-k1+sqrt(k1*k1-4*k0*k2))/2/k2;
+    
+    vc  = va + Ta*a - Z1;
+    Tb = T - Ta;
+    vb = s_acc_vend(vc,-a,-j,Tb);
+    mode = 0;
+    if(abs(s_curve_length(va, vb, vc, a, j, T) - pt) > 1e-10 ...
+            ||Tb<-cons)
+        error('wrong Tb in l8')
+    end
+    return;
+end
+
+% ------------------ l10 -------------------- 
+% vb不为0，可达max_v，b段可达到最大加速度
+Ta = min(s_acc_time(va, vc_max, a, j),T);
+vc  = vc_max;
+la = (va + vc_max)*Ta/2;
+Tb = min([T - Ta, s_acc_time(0, vc_max, a, j), 2*a/j]);
+if(Tb < 2*a/j)
+    l = -1;
+else
+    vb = s_acc_vend(vc,-a,-j,Tb);
+    lb = Tb*(vc+vb)/2;
+    Tc = T - Ta - Tb;
+    lc = Tc * vc_max;
+    l  = la + lb + lc;
+end
+if(pt < l + cons)
+    B = -a/j;
+    C = -(2*la - 2*pt + 2*vc_max*(T - T_va_to_max_v))/a;
+
+    Tb = max((-B+sqrt(B^2-4*C))/2,0);
+    Ta = s_acc_time(va, vc_max, a, j);
+    vb = vc_max - Tb*a + Z1;
+    vc  = vc_max;
+    mode = 0;
+    % error %
+    if(abs(s_curve_length(va, vb, vc, a, j, T) - pt) > 1e-10 ...
+            ||Tb<-cons || Ta < -cons)
+        error('wrong Tb in l10')
+    end
+    return;
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 以下对应可能产生的最大l
+
+
 % ------------------ l7 --------------------- 
 % vb不为0，达不到max_v，a段达不到最大加速度，b段达不到最大加速度
 %
@@ -484,15 +570,9 @@ if(Ta_upper - Ta_below >= 0)
     vb = max(vc - j*Tb*Tb/4, 0);
     l  = Ta * (va + vc) / 2.0 + Tb * (vb + vc) / 2.0;
 end
-
-% if(pt >= l && pt < l + cons)
-% pt
-% l
-% 
-% end
-
-% 此处的cons为必须，因为有可能vb = v
-if(pt < l + cons)
+% 以下条件1可能存在边界点的误判，例如只有减速段为0时
+% 因此若一定无法达到匀加速状态且一定无法加速到max_v，则必然进入该条件
+if(pt < l || T < min(2*a/j, T_va_to_max_v))
     % v  = va + j*Ta*Ta/4
     % la = j/8*Ta^3 + va*Ta
     % Tb = T-Ta
@@ -508,8 +588,8 @@ if(pt < l + cons)
     %
     % Ta = (-k1+sqrt(k1*k1-4*k0*k2))/2/k2
     k2 = T*j/8;
-    k1 = -3*T^2*j/8;
-    k0 = pt - (T*(2*va - (T^2*j)/4))/2;
+    k1 = -3*Z2/8;
+    k0 = pt - (T*(2*va - Z2/4))/2;
 
     % 选根
     % 其极值为 (k1)/(2*k2) = (3*T)/2
@@ -528,55 +608,6 @@ if(pt < l + cons)
     return;
 end
 
-% ------------------ l8 -------------------- 
-% vb不为0，达不到max_v，a段可达到最大加速度，b段可达到最大加速度
-Ta_upper = min([T_va_to_max_v, T - 2*a/j]);
-Ta_below = 2*a/j;
-l=-1;
-if(Ta_upper >= Ta_below)
-    Ta = Ta_upper;
-    vc  = va + Ta*a - a^2/j;
-    la = (va + vc)*Ta/2;
-    Tb = T-Ta;
-    vb = s_acc_vend(vc,-a,-j,Tb);
-    lb = Tb*(vc+vb)/2;
-    l  = la + lb;
-end
-if(pt < l + cons)
-    % syms va T a j pt Ta
-    % v  = va + Ta*a - a^2/j
-    % la = Ta*(va + v)/2
-    % Tb = T-Ta
-    % vb = v - Tb*a + a^2/j;
-    % lb = Tb*(v+vb)/2
-    %
-    % 根据 la + lb = pt，有：
-    % collect(la+lb-pt,Ta)
-    % - a*Ta^2 + 2*T*a*Ta - pt - (T*(T*a - 2*va + a^2/j))/2
-    %
-    % 可得方程系数
-    k2 = -a;
-    k1 = 2*T*a;
-    k0 = - pt - (T*(a^2/j + T*a - 2*va))/2;
-
-    % 选根
-    % 其极值为：
-    % r = k1 / (2*k2) = T
-    % 应有 Ta < T
-    % 故而选其较小的根
-    Ta = (-k1+sqrt(k1*k1-4*k0*k2))/2/k2;
-    
-    vc  = va + Ta*a - a^2/j;
-    Tb = T - Ta;
-    vb = s_acc_vend(vc,-a,-j,Tb);
-    mode = 0;
-    if(abs(s_curve_length(va, vb, vc, a, j, T) - pt) > 1e-10 ...
-            ||Tb<-cons)
-        error('wrong Tb in l8')
-    end
-    return;
-end
-
 % ------------------ l9 -------------------- 
 % vb不为0，达不到max_v，a段可达到最大加速度，b段不可达到最大加速度
 Ta_upper = min([T, T_va_to_max_v]);
@@ -590,7 +621,7 @@ if(Ta_upper >= Ta_below)
     lb = Tb*(vc+vb)/2;
     l  = la + lb;
 end
-if(pt < l + cons)
+if(pt < l || T < T_va_to_max_v)
     % syms va T a j pt Ta
     % v  = va + Ta*a - a^2/j
     % la = Ta*(va + v)/2
@@ -605,8 +636,8 @@ if(pt < l + cons)
     % 可得方程系数
     k3 = j/8;
     k2 = - a/2 - (3*T*j)/8;
-    k1 = (T^2*j)/8 + a^2/(2*j) + (T*(2*a + (T*j)/2))/2;
-    k0 = - pt - (T*((j*T^2)/4 + (2*a^2)/j - 2*va))/2;
+    k1 = Z2*3/8 + Z1/2 + T*a;
+    k0 = - pt - (T*(Z2/4 + 2*Z1 - 2*va))/2;
     
     % 选根
     % syms f(Ta) g(Ta)
@@ -625,7 +656,7 @@ if(pt < l + cons)
     
     Ta = newton_raphson_binary_search(@(x)(k3*x*x*x+k2*x*x+k1*x+k0),2*a/j,T,10*eps);
 
-    vc  = va + Ta*a - a^2/j;
+    vc  = va + Ta*a - Z1;
     Tb = max(T - Ta, 0);
     vb = s_acc_vend(vc,-a,-j,Tb);
     mode = 0;
@@ -645,74 +676,43 @@ if(pt < l + cons)
     return;
 end
 
-% ------------------ l10 -------------------- 
-% vb不为0，可达max_v，b段可达到最大加速度
-Ta = min(s_acc_time(va, vc_max, a, j),T);
-vc  = vc_max;
-la = (va + vc_max)*Ta/2;
-Tb = min([T - Ta, s_acc_time(0, vc_max, a, j), 2*a/j]);
-if(Tb < 2*a/j)
-    l = -1;
-else
-    vb = s_acc_vend(vc,-a,-j,Tb);
-    lb = Tb*(vc+vb)/2;
-    Tc = T - Ta - Tb;
-    lc = Tc * vc_max;
-    l  = la + lb + lc;
-end
-
-if(pt < l + cons)
-    B = -a/j;
-    C = -(2*la - 2*pt + 2*vc_max*(T - T_va_to_max_v))/a;
-
-    Tb = max((-B+sqrt(B^2-4*C))/2,0);
-    Ta = s_acc_time(va, vc_max, a, j);
-    vb = vc_max - Tb*a + a^2/j;
-    vc  = vc_max;
-    mode = 0;
-    % error %
-    if(abs(s_curve_length(va, vb, vc, a, j, T) - pt) > 1e-10 ...
-            ||Tb<-cons || Ta < -cons)
-        error('wrong Tb in l10')
-    end
-    return;
-end
-
 
 % ------------------ l11 -------------------- 
 % vb不为0，可达max_v，b段不可达到最大加速度
-Ta = s_acc_time(va, vc_max, a, j);
+Ta = T_va_to_max_v;
 la = (va + vc_max)*Ta/2;
 Tb = 0;
 lb = 0;
 Tc = T - Ta - Tb;
 lc = Tc * vc_max;
 l  = la + lb + lc;
-
-if(pt < l + cons)
-    Tb = max((la + vc_max*(T - T_va_to_max_v) - pt)*8/j,0)^(1/3);
-    vb = vc_max - j*Tb*Tb/4;
-    vc  = vc_max;
-    mode = 0;
-    if(abs(s_curve_length(va, vb, vc, a, j, T) - pt) > 1e-10 ...
-            || Tb < -cons || Ta < -cons || Ta + Tb > T + cons ...
-            || vb < -cons ...
-            || abs((va + vc)*Ta/2 + (vb + vc)*Tb/2 + vc*(T - Ta - Tb) - pt) > 1e-10)
-        Ta
-        Tb
-        Tc
-        
-        (va + vc)*Ta/2 + (vb + vc)*Tb/2 + vc*Tc
-        pt
-        s_curve_length(va, vb, vc, a, j, T)
-
-        error('wrong Tb in l11')
-    end
+% 此处最终先check error
+if(pt >= l + cons)
+    error('s_make_s_curve failed: too LARGE distance');
     return;
 end
-
-error('s_make_s_curve failed: too LARGE distance');
+Tb = max((la + vc_max*(T - T_va_to_max_v) - pt)*8/j,0)^(1/3);
+vb = vc_max - j*Tb*Tb/4;
+vc  = vc_max;
 mode = 0;
+if(abs(s_curve_length(va, vb, vc, a, j, T) - pt) > 1e-10 ...
+        || Tb < -cons || Ta < -cons || Ta + Tb > T + cons ...
+        || vb < -cons ...
+        || abs((va + vc)*Ta/2 + (vb + vc)*Tb/2 + vc*(T - Ta - Tb) - pt) > 1e-10)
+    Ta
+    Tb
+    Tc
+
+    (va + vc)*Ta/2 + (vb + vc)*Tb/2 + vc*Tc
+    pt
+    s_curve_length(va, vb, vc, a, j, T)
+
+    error('wrong Tb in l11')
+end
+
+
+
+
 
 end
 

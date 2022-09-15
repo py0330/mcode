@@ -15,7 +15,7 @@ function [Tmax, Tmin] = s_s_curve_Tmax_Tmin(pa, va, pb, vb_max, vc_max, a, j)
 
 cons = eps * 10;
 pt = pb - pa;
-
+Z1 = a^2/j;
 
 T_va_to_vb = s_acc_time(va,vb_max,a,j);
 l_va_to_vb = T_va_to_vb*(va + vb_max) /2;
@@ -63,8 +63,8 @@ end
 % p = 1/2*(a^2/(2*j) + va))^2/a          when va - 3/2*a^2/j >  0
 %   = 4/3*va*sqrt(2/3*va/j)              when va - 3/2*a^2/j <= 0
 
-if(va - 3/2*a^2/j >  0)
-    pacc = 1/2*(a^2/(2*j) + va)^2/a;
+if(va - 3/2*Z1 >  0)
+    pacc = 1/2*(Z1/2 + va)^2/a;
 else
     pacc = 4/3*va*sqrt(2/3*va/j);
 end
@@ -77,7 +77,7 @@ else
     % 此时 vb = - a^2/j + va
     % 前进时间 t = (va-vb)/a+a/j
     % 前进长度 l = t*(va+vb)/2 = (2*a*va)/j - a*a*a/j/j
-    if(va<a^2/j || (2*a*va)/j - a*a*a/j/j > pb - pa)
+    if(va<Z1 || (2*a*va)/j - a*a*a/j/j > pt)
         % 此时无匀速段
         % 前进时间为：t = 2 * sqrt( (va-vb) / j );
         % 前进长度的平方为：
@@ -105,8 +105,8 @@ else
         %       2*(pb-pa)*a- a*va*(a/j + va/a)
         % 】
         % 对于根来说，应当取大值，这是因为Tmax应该尽可能的小
-        B = (va - a*(a/j + va/a));
-        C = 2*(pb-pa)*a- a*va*(a/j + va/a);
+        B = -Z1;
+        C = 2*pt*a- va*Z1 - va*va;
         vb = (-B + sqrt(B*B-4*C))/2;
         Tmax = s_acc_time(va,vb,a,j);
     end
@@ -117,7 +117,7 @@ end
 % ------------------ l1 --------------------
 % 加速不到max_vb, 无法达到最大加速度a
 % va < vb < max_vb, vb - va < a^2 / j
-vb = min(va + a^2/j, vb_max);
+vb = min(va + Z1, vb_max);
 l = min(s_acc_time(va,vb,a,j) * (va + vb)/2, l_va_to_vb);
 if(va < vb_max && pt < l)
 %     %%%%%%%%%%%%%%%%% METHOD1 %%%%%%%%%%%%%%%%% 
@@ -199,11 +199,10 @@ end
 vb = vb_max;
 v1 = max(va,vb);
 v2 = min(va,vb);
-v_upper  = min(v2 + a^2/j, vc_max);
+v_upper  = min(v2 + Z1, vc_max);
 v_below  = v1;
-if(v_upper < v_below)
-    l = -1;
-else
+l = -1;
+if(v_upper >= v_below)
     l = s_acc_time(v1, v_upper, a, j) * (v_upper + v1)/2 +...
         s_acc_time(v2, v_upper, a, j) * (v_upper + v2)/2;
 end
@@ -232,11 +231,10 @@ end
 % v1 = max(va,vb), v2 = min(va,vb), v1 < v < min(v2 + a^2/j, max_v)
 v1 = max(va,vb);
 v2 = min(va,vb);
-v_upper  = min(v1 + a^2/j, vc_max);
-v_below  = max(v2 + a^2/j, v1);
-if(v_upper < v_below)
-    l = -1;
-else
+v_upper  = min(v1 + Z1, vc_max);
+v_below  = max(v2 + Z1, v1);
+l = -1;
+if(v_upper >= v_below)
     l = s_acc_time(v1, v_upper, a, j) * (v_upper + v1)/2 +...
         s_acc_time(v2, v_upper, a, j) * (v_upper + v2)/2;
 end
@@ -275,7 +273,7 @@ end
 v1 = max(va,vb);
 v2 = min(va,vb);
 v_upper  = vc_max;
-v_below  = v1 + a^2/j;
+v_below  = v1 + Z1;
 if(v_upper < v_below)
     l = -1;
 else
