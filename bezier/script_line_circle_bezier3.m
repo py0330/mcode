@@ -24,11 +24,6 @@ syms rx ry
 diff(sin(s*s*s*theta).*ry + cos(s*s*s*theta).*rx, s)
 diff(diff(sin(s*s*s*theta).*ry + cos(s*s*s*theta).*rx, s),s)
 
-%%
-syms theta1 ry1 rx1 k
-diff(sin(-(1-k)*(1-k)*(1-k)*theta1).*ry1 + cos(-(1-k)*(1-k)*(1-k)*theta1).*rx1,k)
-
-% diff(line_part)
 % 
 % p2 = p1;
 % 
@@ -43,6 +38,7 @@ diff(sin(-(1-k)*(1-k)*(1-k)*theta1).*ry1 + cos(-(1-k)*(1-k)*(1-k)*theta1).*rx1,k
 % 
 % dd0 = diff(d0,s)
 % d2d0 = diff(dd0,s)
+
 %% s_blend_line_line
 clear
 p0=[0.3;0.8;-0.3];
@@ -115,16 +111,21 @@ plot((1.5:1:size(s,2))',diff(arc_est)/ds,'.-.')
 
 %% s_blend_line_circle
 clear
-theta = pi/3;
-center = [-1.5;0.8;0.2];
-radius = 1.3;
-ax = [0.3;0.5;1.2]/norm([0.3;0.5;1.2]);
+theta = pi/18;
+center = [0,0,0]';
+radius = 5;
+ax = [0,0,1]';
 
 rkkk = cross([-1,0,0]',ax);
 rkkk = rkkk/norm(rkkk);
 
 p0 = [3.5,0.7,-2.8]';
 p1 = center + radius * rkkk;
+
+p0 = cross(p1-center,ax);
+p0 = p0/norm(p0)*theta*radius;
+p0 = p1 + p0;
+
 
 ds = 0.01;
 s = 0:ds:1;
@@ -134,6 +135,9 @@ subplot(1,3,1)
 hold on
 plot3(p(1,:),p(2,:),p(3,:), '.--')
 axis equal
+
+scatter3(p1(1),p1(2),p1(3))
+scatter3(p0(1),p0(2),p0(3))
 
 % plot line
 line = p0*s+p1*(1-s);
@@ -251,6 +255,84 @@ plot(ddp')
 
 
 %% s_blend_line_circle arc 
+
+
+
+
+%% s_blend_line_line_reverse
+clear
+theta = 0;
+
+p0=[1;0;0];
+p1=[0;0;0];
+p2=[cos(theta);sin(theta);0];
+
+ds = 0.01;
+s = 0:ds:1;
+[p,dp,ddp] = s_blend_line_line_bezier3(p0,p1,p2,s);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  PLOT 1
+subplot(1,3,1)
+hold on
+plot3(p(1,:),p(2,:),p(3,:), '.--')
+axis equal
+
+% plot line 1
+line = p0*s+p1*(1-s);
+plot3(line(1,:),line(2,:),line(3,:))
+
+% plot line 2
+line = p1*s+p2*(1-s);
+plot3(line(1,:),line(2,:),line(3,:))
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  PLOT 2
+subplot(1,3,2)
+hold on
+plot(diff(p')/ds)
+plot(dp')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  PLOT 3
+subplot(1,3,3)
+hold on
+plot(diff(dp')/ds)
+plot(ddp')
+
+hold off
+[ds_over_darc, d2s_over_darc2, darc, d2arc] = s_ds_over_darc(dp, ddp);
+
+plot(darc)
+hold on
+plot(d2arc)
+
+darc_compare = sqrt(sum(dp.^2));
+plot(darc_compare,'.--')
+plot(diff(darc_compare)/ds,'.--')
+
+
+[arc_est, darc_est, ddarc_est] = s_estimate_bezier3_arc(darc(1), d2arc(1), darc(end), d2arc(end), darc(0.5/ds + 1), s);
+
+% A = [0,0,0,1;1,1,1,1;0,0,1,0;3,2,1,0];
+% 
+% coe = A^-1 * [darc(1), darc(end), d2arc(1), d2arc(end)]';
+% a = coe(1)
+% b = coe(2)
+% c = coe(3)
+% d = coe(4)
+% darc_estimate = a.*s.^3 + b.*s.^2 + c.*s + d;
+
+
+plot(darc_est,'.--')
+plot(ddarc_est,'.--')
+plot((1.5:1:size(s,2))',diff(arc_est)/ds,'.-.')
+
+% plot(ds_over_darc)
+% hold on
+% plot(d2s_over_darc2)
+% hold on
+% ds_compare = 1./sqrt(sum(dp.^2));
+% % plot(ds_compare,'.')
+% plot(diff(ds_compare)./(darc(1:end-1)'*ds),'.')
+
 
 
 

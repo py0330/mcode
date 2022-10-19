@@ -200,20 +200,15 @@ end
 darc = sqrt(sum(dq.*dq));
 ddarc = sum(dq.*ddq)./darc;
 
-c = darc(1)
-b = 4*(darc(floor(length(s)/2)+1)-c)
-a = -b
-
-d = (ddarc(1)-b)/pi;
-e = (ddarc(1)-b)/pi*0.5;
-f = -(ddarc(1)-b)/pi*0.5;
+[arc_est, darc_est, ddarc_est] = s_estimate_bezier3_arc(darc(1), ddarc(1), darc(end), ddarc(end), darc((length(darc) + 1)/2), s);
 
 subplot(1,2,1)
 hold on
 axis equal
 plot(s,darc)
 plot(s,ddarc)
-plot(s,a.*s.*s+b.*s+c)
+plot(s,darc_est)
+plot(s,ddarc_est)
 % plot(s,2*a.*s+b)
 
 subplot(1,2,2)
@@ -224,9 +219,9 @@ plot(s(2:end)-ds/2,sqrt(sum(diff(q')'.*diff(q')'))/ds)
 
 plot(s,darc)
 plot(s,ddarc)
-plot(s,a.*s.*s+b.*s+c+ d*sin(s*pi) + e*cos(s*2*pi) + f)
-plot(s,a.*s.*s+b.*s+c+ d*sin(s*pi) + e*cos(s*2*pi) + f + (c/7)*(1-cos(4*pi*s))/2)
-plot(s,2*a.*s+b+d*cos(s*pi)*pi - e*sin(s*2*pi)*2*pi)
+% plot(s,a.*s.*s+b.*s+c+ d*sin(s*pi) + e*cos(s*2*pi) + f)
+% % plot(s,a.*s.*s+b.*s+c+ d*sin(s*pi) + e*cos(s*2*pi) + f + (c/7)*(1-cos(4*pi*s))/2)
+% plot(s,2*a.*s+b+d*cos(s*pi)*pi - e*sin(s*2*pi)*2*pi)
 
 
 
