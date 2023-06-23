@@ -1,4 +1,42 @@
 %%
+syms a j T va l Ta vb
+k0 = (va*(a^2/j + va))/2 - va*(a^2/j - T + va) - pt
+%%
+    clear
+    syms va j Ta pt T a f(Ta)
+    v  = va + j*Ta*Ta/4
+    la = (v+va)/2*Ta
+    Tb = (v + a^2/j)/a
+    lb = Tb*v/2
+    lc = (T - Ta - Tb)*v
+    
+    l = la+lb+lc
+    
+    collect(l-pt,Ta)
+%%
+% 此时加速段可以达到最大加速度
+% Ta = (-vb+va) / a + a/j
+% Ta = 2*sqrt((vb-va)/j)
+% eq = Ta * (va+vb)/2 + (T-Ta)*vb - l
+
+a = 1.41088386423619;
+j = 861.641486298486;
+va = 3.96201287424822;
+vc=3.96201287425158;
+vb=0;
+T =2.80981544754751
+pt=5.56626272515132
+Ta = 1.24936077103212e-07;
+Tb = 2.80981532261144
+
+
+k0 = -2.75300615637519e-15;
+k0 = T*va - pt - va^2/(2*a) - (a*va)/(2*j)
+k2 = (T * j) / 4.0 - a / 8.0 - (j * va) / (4.0 * a)
+k3 = -j / 8.0
+k4 = -j*j / (32.0 * a)
+% solve(eq,vb)
+%%
 syms v0 v1 T T1
 
 % T1 = 2*sqrt((v0 - v1)/j)

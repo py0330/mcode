@@ -1,14 +1,14 @@
 %% clb
-m = dlmread('C:/Users/py033/Desktop/calib/calib_dyn_par1.txt');
+m = dlmread('C:/Users/py033/Desktop/calib/calib_dyn_par_1102.txt');
 
 %% clb
 for i=1:6
     subplot(2,3,i)
     hold on
 %     plot(m(:,1 + (i-1) * 3))
-    plot(diff(m(:,1 + (i-1) * 3))*1000)
+%     plot(diff(m(:,1 + (i-1) * 3))*1000)
 %     
-    plot(m(:,2 + (i-1) * 3))
+%     plot(m(:,2 + (i-1) * 3))
 %      plot(m(:,3 + (i-1) * 3)/1000)
 end
 
@@ -62,39 +62,39 @@ f6 = dlmread('C:/Users/py033/Desktop/calib/data_after/f5.txt');
 %% clb result
 subplot(2,3,1)
 hold on
-% plot(f1)
-% plot(fce1)
-plot(vel1)
+plot(f1)
+plot(fce1)
+% plot(vel1)
 
 subplot(2,3,2)
 hold on
-% plot(f2)
-% plot(fce2)
-plot(vel2)
+plot(f2)
+plot(fce2)
+% plot(vel2)
 
 subplot(2,3,3)
 hold on
-% plot(f3)
-% plot(fce3)
-plot(vel3)
+plot(f3)
+plot(fce3)
+% plot(vel3)
 
 subplot(2,3,4)
 hold on
-% plot(f4)
-% plot(fce4)
-plot(vel4)
+plot(f4)
+plot(fce4)
+% plot(vel4)
 
 subplot(2,3,5)
 hold on
-% plot(f5)
-% plot(fce5)
-plot(vel5)
+plot(f5)
+plot(fce5)
+% plot(vel5)
 
 subplot(2,3,6)
 hold on
-% plot(f6)
-% plot(fce6)
-plot(vel6)
+plot(f6)
+plot(fce6)
+% plot(vel6)
 
 
 %% 

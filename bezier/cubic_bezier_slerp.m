@@ -1,5 +1,5 @@
 %% init data
-theta = 0;
+theta = pi;
 dis = pi/3;
 
 q0 = [[1,0,0]*sin(dis/2),cos(dis/2)]';

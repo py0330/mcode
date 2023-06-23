@@ -253,6 +253,72 @@ plot(diff(dp')/ds)
 plot(ddp')
 
 
+%% s_blend_circle_circle
+clc
+clear
+
+% center = [0.57345962137149420;0.22504954769300603;0.23562075307425620]
+% p0 = [0.60198384418161333;0.20742573893289451;0.24832503880025239]
+% axis = [0.0019395681385318642;-0.58269493919875459;-0.81268865250327915]
+% radius = 0.035855666190186097
+
+p1 = [0.8;0.3;-1.5];
+
+theta1 = 0.01/0.035855666190186097;
+c1 = [-1.5;0.8;0.2];
+ax1 = cross(c1-p1,[0.5;0.3;0.8]);
+ax1 = ax1/norm(ax1);
+
+theta2 = pi*2/3;
+c2 = [0.58403509793717567;0.22044018761897119;-0.3];
+ax2 = cross(c2-p1,[0;1;0]);
+ax2 = ax2/norm(ax2);
+
+ds = 0.01;
+s = 0:ds:1;
+[p,dp,ddp] = s_blend_circle_circle_bezier3(p1,c1,ax1,theta1,c2,ax2,theta2,s);
+
+subplot(1,3,1)
+hold on
+plot3(p(1,:),p(2,:),p(3,:), '.--')
+axis equal
+
+plot3(p1(1,:),p1(2,:),p1(3,:), '*')
+
+rx = p1 - c1;
+ry = -cross(ax1, rx);
+circle = c1 + cos(theta1.*s).*rx+sin(theta1.*s).*ry;
+plot3(circle(1,:),circle(2,:),circle(3,:))
+
+rx = p1 - c2;
+ry = cross(ax2, rx);
+circle = c2 + cos(theta2.*s).*rx+sin(theta2.*s).*ry;
+plot3(circle(1,:),circle(2,:),circle(3,:))
+
+
+figure1 = plot3(p(1,1),p(2,1),p(3,1), '.','MarkerFaceColor','r','MarkerSize',10)
+
+% for k = 1:size(p,2)
+%     figure1.XData = p(1,k);
+%     figure1.YData = p(2,k);
+%     figure1.ZData = p(3,k);
+%     drawnow
+%     pause(0.1);
+% end
+
+subplot(1,3,2)
+hold on
+plot(diff(p')/ds)
+plot(dp')
+
+subplot(1,3,3)
+hold on
+plot(diff(dp')/ds)
+plot(ddp')
+
+
+
+
 
 %% s_blend_line_circle arc 
 
@@ -261,7 +327,7 @@ plot(ddp')
 
 %% s_blend_line_line_reverse
 clear
-theta = 0;
+theta = 0.1;
 
 p0=[1;0;0];
 p1=[0;0;0];
@@ -325,6 +391,13 @@ plot(darc_est,'.--')
 plot(ddarc_est,'.--')
 plot((1.5:1:size(s,2))',diff(arc_est)/ds,'.-.')
 
+% c = theta*theta/8/pi;
+% a = norm(ddp(:,end)) / atan(1.0/c/2);
+% 
+% 
+% x = s-0.5;
+% plot(atan(x/c) *a)
+
 % plot(ds_over_darc)
 % hold on
 % plot(d2s_over_darc2)
@@ -332,10 +405,128 @@ plot((1.5:1:size(s,2))',diff(arc_est)/ds,'.-.')
 % ds_compare = 1./sqrt(sum(dp.^2));
 % % plot(ds_compare,'.')
 % plot(diff(ds_compare)./(darc(1:end-1)'*ds),'.')
+%%
+clear
+m = 3;
+n = 4;
+ds = 0.001;
+for i=1:m*n
+%     i
+%     m
+%     n
+    theta = linspace(0,pi,m*n);
+    theta = theta(i);
+    
+    r = 2.0;
+    p0=[r;0;0];
+    p1=[0;0;0];
+    p2=[r*cos(theta);r*sin(theta);0];
+
+    s = 0:ds:1;
+    [p,dp,ddp] = s_blend_line_line_bezier3(p0,p1,p2,s);
+    subplot(m,n,i)
+    hold on;
+    [ds_over_darc, d2s_over_darc2, darc, d2arc] = s_ds_over_darc(dp, ddp);
+    plot(s,darc);
+    plot(s,d2arc);
+    darc_compare = sqrt(sum(dp.^2));
+    plot(s(1:end),darc_compare,'.--');
+    plot(s(1:end-1)+ds/2,diff(darc_compare)/ds,'.--');
+    
+
+    theta = (darc(1/ds/2+1)/darc(end))*2*pi;
+    c = theta^1.5*0.06;
+    a = norm(ddp(:,end)) / atan(1.0/c/2);
+
+    x = s-0.5;
+    plot(s,atan(x/c) *a);
+
+    [arc_est, darc_est, ddarc_est] = s_estimate_bezier3_arc(darc(1), d2arc(1), darc(end), d2arc(end), darc(0.5/ds + 1), s);
+    plot(s(1:end-1)+ds/2,diff(arc_est)/ds,'--');
+    plot(s,darc_est,'--');
+    plot(s,ddarc_est,'--');
+    title([num2str(theta)]);
+    
+%     darc_est(501)
+%     darc(501) - darc_est(501)
+    arc_est(1)
+end
+%%
+% H = -(darc50 - ratio*(a/8 + b/4 + c/2 + d) + (j - h*i*log(h))*(ratio - 1))/(4*pi);
+% X = (ratio - 1)*(j/2 - k + (h*i)/4)/(4*pi);
+
+clear
+syms a b c d h i j k lx at s ratio darc50
+ddarcA = a.*s.^2.*3 + b.*s   .*2 + c                ;
+darcA  = a.*s.^3    + b.*s.^2    + c.*s       + d   ;
+arcA   = a.*s.^4./4 + b.*s.^3./3 + c.*s.^2./2 + d.*s;
+
+x = s - 0.5;
+
+ddarcB = at;
+darcB  = x.*at - lx + j;
+arcB   = k - at*h^2/2 + x.*x.*at/2 - x.*lx + x*i*h/2+ x*j;
+
+darcA50 = 0.125.*a + 0.25.*b + 0.5.*c + d;
+darcB50 = -log(h)*h*i + j;
+darcE50 = darc50 - (ratio * darcA50   + (1-ratio)*darcB50);
+
+arc   = ratio*arcA    + (1-ratio)*arcB   + s*darcE50/2 - sin(2*pi*s)/2*darcE50/2/pi;
+darc  = ratio*darcA   + (1-ratio)*darcB  + (1-cos(2*pi*s))/2 * darcE50;
+ddarc = ratio*ddarcA  + (1-ratio)*ddarcB + sin(2*pi*s)*pi*darcE50;
+
+expand(arc)
+D = darc50/2 - (ratio - 1)*(j + (h*i)/2) + d*ratio - (ratio*(a/8 + b/4 + c/2 + d))/2 + ((j - h*i*log(h))*(ratio - 1))/2;
+collect(darc,s)
+Y = d*ratio - (cos(2*pi*s)/2 - 1/2)*(darc50 - ratio*(a/8 + b/4 + c/2 + d) + (j - h*i*log(h))*(ratio - 1)) + (ratio - 1)*(at/2 - j + lx);
+collect(Y,s)
+D = darc50/2 - (ratio - 1)*(j + (h*i)/2) + d*ratio - (ratio*(a/8 + b/4 + c/2 + d))/2 + ((j - h*i*log(h))*(ratio - 1))/2;
+J = -(darc50 - ratio*(a/8 + b/4 + c/2 + d) + (j - h*i*log(h))*(ratio - 1))/(4*pi);
+d*ratio + - 1/2*J*4*pi + (ratio - 1)*( - j) - D
+
+
+collect(ddarc,s)
+
+
+
+%%
+syms x h i k
+f(x)=i*(...
+        (x.*x+h*h)/2.*atan2(x, h)-h*x/2 ...
+        - (x.*log(x.*x + h*h)+2*h*atan2(x, h)-2*x)*h/2 ...
+        ) + k;
+f(-0.5)
+
+eqn = i*(...
+        (x.*x+h*h)/2.*atan2(x, h)-h*x/2 ...
+        - (x.*log(x.*x + h*h)+2*h*atan2(x, h)-2*x)*h/2 ...
+        ) + k
+expand(eqn)
+%%
+c = theta/8/pi;
+a = 6 / atan(1.0/c/2);
+
+x = s-0.5;
+
+ddp = atan(x/c) *a;
+dp = (x.*atan(x/c) - c/2*log(x.*x + c*c))*a;
+p  = a*(...
+        (x.*x+c*c)/2.*atan(x/c)-c*x/2 ...
+        - (x.*log(x.*x + c*c)+2*c*atan(x/c)-2*x)*c/2 ...
+        );
+
+
+figure
+hold on
+plot(s,ddp)
+plot(s(1:end-1)+ds/2, diff(dp)/ds)
+plot(s(1:end-2)+ds, diff(diff(p))/ds/ds)
 
 
 
 
+
+% dp = 
 
 %% bezier 3 blend line circle
 theta = pi/3;

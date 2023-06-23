@@ -243,7 +243,7 @@ if(pt < l)
     %
     % collect(l-pt,Ta)
     %
-    % k4 = -j^2/32
+    % k4 = -j^2/(32*a)
     % k3 = -j/8
     % k2 = (j*(a^2/j + va))/8 - (j*va)/8 - (j*(a^2/j - T + va))/4
     % k0 = (va*(a^2/j + va))/2 - va*(a^2/j - T + va) - pt

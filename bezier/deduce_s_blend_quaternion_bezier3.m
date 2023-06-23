@@ -282,4 +282,3 @@ plot(s,2*a.*s+b+d*cos(s*pi)*pi - e*sin(s*2*pi)*2*pi)
 
 
 
-
