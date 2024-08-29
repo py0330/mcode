@@ -25,6 +25,7 @@ for j=1:length(t)
         end
         t_left = t_left - T(k);
     end
+
     for r=1:n
         if(i==1)
             p(j,r) = s_s_curve( ...

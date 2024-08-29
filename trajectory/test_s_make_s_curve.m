@@ -308,3 +308,23 @@ diff_ = 0.020291056968836301
 
 xyz(1,1861)
 xyz(1,1861) + diff_
+%% test s_cpt_vb_upper CASE 2.4
+clc
+clear
+pa = 0;
+pb = 0.33;
+
+va = 1;
+vc_max = 10;
+vb_max = 1;
+
+a = 1.0;
+j = 10.0;
+T = 0.35;
+
+vb = s_scurve_cpt_vb_upper(pa, va, pb, vc_max, vb_max, a, j, T)
+
+
+% s_acc_time(va,0.5,a,j)
+% 
+% 0.6*(va+0.5)/2

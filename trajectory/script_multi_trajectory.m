@@ -1,6 +1,6 @@
 %% test multi ee, make data
 clear;
-m  = 10;% point num
+m  = 50;% point num
 n  = 5; % ee num
 
 v0 = zeros(1,n);
@@ -51,6 +51,7 @@ j = diff(a)/dt;
 
 if(max(max(v)) > max(max(vel)) + 1e-10)
     max(max(v)) - max(max(vel))
+    max(max(v)) - max(max(vel))
     [value, pos_at]=max(v)
     error('v error')
 end
@@ -59,33 +60,39 @@ if(max(max(a)) > max(max(acc)) + 1e-7)
     error('a error')
 end
 
+if(max(max(j)) > max(max(jerk)) + max(max(jerk))*1e-3)
+    max(max(jerk))
+    max(max(j))
+    error('j error')
+end
+
 %%
-% for j=1:n
-    subplot(1,4,1);
-    plot(t,p);
-%     axis equal
-    for i=1:m
-        line([sum(T(1:i)) sum(T(1:i))],[0 1.1*max(pos(end,:))],'linestyle','--', 'Color','k');
-    end
-    subplot(1,4,2);
-    plot(t(2:end)-dt/2,v);
-%     axis equal
-    for i=1:m
-        line([sum(T(1:i)) sum(T(1:i))],[-1.1*max(vel(end,:)) 1.1*max(vel(end,:))],'linestyle','--', 'Color','k');
-    end
-
-    subplot(1,4,3);
-    plot(t(3:end)-dt/2*3,a);
-%     axis equal
-    for i=1:m
+% % for j=1:n
+%     subplot(1,4,1);
+%     plot(t,p);
+% %     axis equal
+%     for i=1:m
+%         line([sum(T(1:i)) sum(T(1:i))],[0 1.1*max(pos(end,:))],'linestyle','--', 'Color','k');
+%     end
+%     subplot(1,4,2);
+%     plot(t(2:end)-dt/2,v(:,:));
+% %     axis equal
+%     for i=1:m
+%         line([sum(T(1:i)) sum(T(1:i))],[-1.1*max(vel(end,:)) 1.1*max(vel(end,:))],'linestyle','--', 'Color','k');
+%     end
+% 
+%     subplot(1,4,3);
+%     plot(t(3:end)-dt/2*3,a);
+% %     axis equal
+%     for i=1:m
+% %         line([sum(T(1:i)) sum(T(1:i))],[-1.1*max(acc(end,:)) 1.1*max(acc(end,:))],'linestyle',':', 'Color','k');
+%     end
+% 
+%     subplot(1,4,4);
+%     plot(t(4:end)-dt/2*5,j(:,:));
+% %     axis equal
+%     for i=1:m
 %         line([sum(T(1:i)) sum(T(1:i))],[-1.1*max(acc(end,:)) 1.1*max(acc(end,:))],'linestyle',':', 'Color','k');
-    end
-
-    subplot(1,4,4);
-    plot(t(4:end)-dt/2*5,j);
-%     axis equal
-    for i=1:m
-        line([sum(T(1:i)) sum(T(1:i))],[-1.1*max(acc(end,:)) 1.1*max(acc(end,:))],'linestyle',':', 'Color','k');
-    end
-% end
+%     end
+% % end
 

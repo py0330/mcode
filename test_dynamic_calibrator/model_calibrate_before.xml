@@ -1,0 +1,51 @@
+<Model name="object" time="0">
+    <Environment __prop_name__="environment" gravity="{0,-9.81,0,0,0,0}"/>
+    <VariablePoolElement __prop_name__="variable_pool"/>
+    <PartPoolElement __prop_name__="part_pool">
+        <Part name="ground" active="true" pe="{0,0,0,-0,0,-0}" vel="{0,0,0,0,0,0}" acc="{0,0,0,0,0,0}" inertia="{1,0,0,0,1,1,1,0,0,0}">
+            <MarkerPoolElement __prop_name__="marker_pool">
+                <Marker name="joint_0_j" active="true" pe="{0,0,0,0.785398163397448,0,0.785398163397448}"/>
+                <Marker name="point_motion_0_j" active="true" pe="{0,0,0,0,0,-0}"/>
+            </MarkerPoolElement>
+            <GeometryPoolElement __prop_name__="geometry_pool"/>
+        </Part>
+        <Part name="part_1" active="true" pe="{0,0.165468,0,0.785398163397448,0,0.785398163397448}" vel="{0,0,0,0,0,0}" acc="{0,0,0,0,0,0}" inertia="{1.469,0,0,0,0,0,0.007667511,0,0,0}">
+            <MarkerPoolElement __prop_name__="marker_pool">
+                <Marker name="joint_0_i" active="true" pe="{-0.165468,-1.01319928280657e-17,0,3.06161699786838e-17,0,3.06161699786838e-17}"/>
+                <Marker name="joint_1_j" active="true" pe="{0.034532,2.11447516340782e-18,0,3.06161699786838e-17,0,3.06161699786838e-17}"/>
+            </MarkerPoolElement>
+            <GeometryPoolElement __prop_name__="geometry_pool"/>
+        </Part>
+        <Part name="part_2" active="true" pe="{0,0.366209,0,0.785398163397448,0,0.785398163397448}" vel="{0,0,0,0,0,0}" acc="{0,0,0,0,0,0}" inertia="{2.285,0,0,0,0,0,0.009103,0,0,0}">
+            <MarkerPoolElement __prop_name__="marker_pool">
+                <Marker name="joint_1_i" active="true" pe="{-0.166209,-1.01773659919741e-17,0,3.06161699786838e-17,0,3.06161699786838e-17}"/>
+                <Marker name="point_motion_0_i" active="true" pe="{0.033791,2.06910199949941e-18,0,-0,0,-0}"/>
+            </MarkerPoolElement>
+            <GeometryPoolElement __prop_name__="geometry_pool"/>
+        </Part>
+    </PartPoolElement>
+    <MotionPoolElement __prop_name__="motion_pool">
+        <Motion name="motion_0" active="true" prt_m="part_1" prt_n="ground" mak_i="joint_0_i" mak_j="joint_0_j" cf="{0}" mp="{0}" mv="{0}" ma="{0}" component="5" pitch="0" rotate_range="0" mp_offset="0" mp_factor="1" frc_coe="{0,0,0}"/>
+        <Motion name="motion_1" active="true" prt_m="part_2" prt_n="part_1" mak_i="joint_1_i" mak_j="joint_1_j" cf="{0}" mp="{0}" mv="{0}" ma="{0}" component="5" pitch="0" rotate_range="0" mp_offset="0" mp_factor="1" frc_coe="{0,0,0}"/>
+    </MotionPoolElement>
+    <JointPoolElement __prop_name__="joint_pool">
+        <RevoluteJoint name="joint_0" active="true" prt_m="part_1" prt_n="ground" mak_i="joint_0_i" mak_j="joint_0_j" cf="{0,0,0,0,0}"/>
+        <RevoluteJoint name="joint_1" active="true" prt_m="part_2" prt_n="part_1" mak_i="joint_1_i" mak_j="joint_1_j" cf="{0,0,0,0,0}"/>
+    </JointPoolElement>
+    <GeneralMotionPoolElement __prop_name__="general_motion_pool">
+        <PointMotion name="point_motion_0" active="true" prt_m="part_2" prt_n="ground" mak_i="point_motion_0_i" mak_j="point_motion_0_j" cf="{0,0,0}" mp="{0,0,0}" mv="{0,0,0}" ma="{0,0,0}"/>
+    </GeneralMotionPoolElement>
+    <ForcePoolElement __prop_name__="force_pool">
+        <SingleComponentForce name="f1" active="true" prt_m="part_1" prt_n="ground" mak_i="joint_0_i" mak_j="joint_0_j" component="5"/>
+        <SingleComponentForce name="f2" active="true" prt_m="part_2" prt_n="part_1" mak_i="joint_1_i" mak_j="joint_1_j" component="5"/>
+    </ForcePoolElement>
+    <SolverPoolElement __prop_name__="solver_pool">
+        <InverseKinematicSolver root_num="1" which_root="0" max_iter_count="100" max_error="0.0000000001"/>
+        <ForwardKinematicSolver root_num="1" which_root="0" max_iter_count="100" max_error="0.0000000001"/>
+        <InverseDynamicSolver root_num="1" which_root="0" max_iter_count="100" max_error="0.0000000001"/>
+        <ForwardDynamicSolver root_num="1" which_root="0" max_iter_count="100" max_error="0.0000000001"/>
+    </SolverPoolElement>
+    <CalibratorPoolElement __prop_name__="calibrator_pool">
+        <Calibrator data_index="{0,1,2,3}" filter_window_size="50" tolerable_variance="0.05" velocity_ratio="{1,1}" torque_constant="{1,1}" torque_weight="{1,1}" velocity_dead_zone="{}"/>
+    </CalibratorPoolElement>
+</Model>

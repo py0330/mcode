@@ -1,8 +1,11 @@
-%% clb
-m = dlmread('C:/Users/py033/Desktop/calib/calib_dyn_par_1102.txt');
+%% 
+axis_num = 2;
 
 %% clb
-for i=1:6
+m = dlmread('D:/Private/mcode/test_dynamic_calibrator/data/calib_dyn_par_1102.txt');
+
+%% clb
+for i=1:axis_num
     subplot(2,3,i)
     hold on
 %     plot(m(:,1 + (i-1) * 3))
@@ -26,75 +29,79 @@ subplot(4,1,4)
 plot(m(:,4) + m(:,7))
 % plot(m(:,)*1.414*1e4)
 %% clb result
-pos1 = dlmread('C:/Users/py033/Desktop/calib/data_after/pos0.txt');
-pos2 = dlmread('C:/Users/py033/Desktop/calib/data_after/pos1.txt');
-pos3 = dlmread('C:/Users/py033/Desktop/calib/data_after/pos2.txt');
-pos4 = dlmread('C:/Users/py033/Desktop/calib/data_after/pos3.txt');
-pos5 = dlmread('C:/Users/py033/Desktop/calib/data_after/pos4.txt');
-pos6 = dlmread('C:/Users/py033/Desktop/calib/data_after/pos5.txt');
+dir = 'D:/Private/mcode/test_dynamic_calibrator/data_after/';
 
-acc1 = dlmread('C:/Users/py033/Desktop/calib/data_after/acc0.txt');
-acc2 = dlmread('C:/Users/py033/Desktop/calib/data_after/acc1.txt');
-acc3 = dlmread('C:/Users/py033/Desktop/calib/data_after/acc2.txt');
-acc4 = dlmread('C:/Users/py033/Desktop/calib/data_after/acc3.txt');
-acc5 = dlmread('C:/Users/py033/Desktop/calib/data_after/acc4.txt');
-acc6 = dlmread('C:/Users/py033/Desktop/calib/data_after/acc5.txt');
+pos1 = dlmread(append(dir, 'pos0.txt'));
+pos2 = dlmread(append(dir, 'pos1.txt'));
+% pos3 = dlmread('C:/Users/py033/Desktop/calib/data_after/pos2.txt');
+% pos4 = dlmread('C:/Users/py033/Desktop/calib/data_after/pos3.txt');
+% pos5 = dlmread('C:/Users/py033/Desktop/calib/data_after/pos4.txt');
+% pos6 = dlmread('C:/Users/py033/Desktop/calib/data_after/pos5.txt');
 
-vel1 = dlmread('C:/Users/py033/Desktop/calib/data_after/vel0.txt');
-vel2 = dlmread('C:/Users/py033/Desktop/calib/data_after/vel1.txt');
-vel3 = dlmread('C:/Users/py033/Desktop/calib/data_after/vel2.txt');
-vel4 = dlmread('C:/Users/py033/Desktop/calib/data_after/vel3.txt');
-vel5 = dlmread('C:/Users/py033/Desktop/calib/data_after/vel4.txt');
-vel6 = dlmread('C:/Users/py033/Desktop/calib/data_after/vel5.txt');
+acc1 = dlmread(append(dir, 'acc0.txt'));
+acc2 = dlmread(append(dir, 'acc1.txt'));
+% acc3 = dlmread('C:/Users/py033/Desktop/calib/data_after/acc2.txt');
+% acc4 = dlmread('C:/Users/py033/Desktop/calib/data_after/acc3.txt');
+% acc5 = dlmread('C:/Users/py033/Desktop/calib/data_after/acc4.txt');
+% acc6 = dlmread('C:/Users/py033/Desktop/calib/data_after/acc5.txt');
 
-fce1 = dlmread('C:/Users/py033/Desktop/calib/data_after/fce0.txt');
-fce2 = dlmread('C:/Users/py033/Desktop/calib/data_after/fce1.txt');
-fce3 = dlmread('C:/Users/py033/Desktop/calib/data_after/fce2.txt');
-fce4 = dlmread('C:/Users/py033/Desktop/calib/data_after/fce3.txt');
-fce5 = dlmread('C:/Users/py033/Desktop/calib/data_after/fce4.txt');
-fce6 = dlmread('C:/Users/py033/Desktop/calib/data_after/fce5.txt');
-f1 = dlmread('C:/Users/py033/Desktop/calib/data_after/f0.txt');
-f2 = dlmread('C:/Users/py033/Desktop/calib/data_after/f1.txt');
-f3 = dlmread('C:/Users/py033/Desktop/calib/data_after/f2.txt');
-f4 = dlmread('C:/Users/py033/Desktop/calib/data_after/f3.txt');
-f5 = dlmread('C:/Users/py033/Desktop/calib/data_after/f4.txt');
-f6 = dlmread('C:/Users/py033/Desktop/calib/data_after/f5.txt');
+vel1 = dlmread(append(dir, 'vel0.txt'));
+vel2 = dlmread(append(dir, 'vel1.txt'));
+% vel3 = dlmread('C:/Users/py033/Desktop/calib/data_after/vel2.txt');
+% vel4 = dlmread('C:/Users/py033/Desktop/calib/data_after/vel3.txt');
+% vel5 = dlmread('C:/Users/py033/Desktop/calib/data_after/vel4.txt');
+% vel6 = dlmread('C:/Users/py033/Desktop/calib/data_after/vel5.txt');
+
+fce1 = dlmread(append(dir, 'fce0.txt'));
+fce2 = dlmread(append(dir, 'fce1.txt'));
+% fce3 = dlmread('C:/Users/py033/Desktop/calib/data_after/fce2.txt');
+% fce4 = dlmread('C:/Users/py033/Desktop/calib/data_after/fce3.txt');
+% fce5 = dlmread('C:/Users/py033/Desktop/calib/data_after/fce4.txt');
+% fce6 = dlmread('C:/Users/py033/Desktop/calib/data_after/fce5.txt');
+f1 = dlmread(append(dir, 'f0.txt'));
+f2 = dlmread(append(dir, 'f1.txt'));
+% f3 = dlmread('C:/Users/py033/Desktop/calib/data_after/f2.txt');
+% f4 = dlmread('C:/Users/py033/Desktop/calib/data_after/f3.txt');
+% f5 = dlmread('C:/Users/py033/Desktop/calib/data_after/f4.txt');
+% f6 = dlmread('C:/Users/py033/Desktop/calib/data_after/f5.txt');
 %% clb result
 subplot(2,3,1)
 hold on
+plot(pos1)
 plot(f1)
 plot(fce1)
-% plot(vel1)
+plot(vel1)
 
 subplot(2,3,2)
 hold on
+plot(pos2)
 plot(f2)
 plot(fce2)
-% plot(vel2)
+plot(vel2)
 
-subplot(2,3,3)
-hold on
-plot(f3)
-plot(fce3)
-% plot(vel3)
-
-subplot(2,3,4)
-hold on
-plot(f4)
-plot(fce4)
-% plot(vel4)
-
-subplot(2,3,5)
-hold on
-plot(f5)
-plot(fce5)
-% plot(vel5)
-
-subplot(2,3,6)
-hold on
-plot(f6)
-plot(fce6)
-% plot(vel6)
+% subplot(2,3,3)
+% hold on
+% plot(f3)
+% plot(fce3)
+% % plot(vel3)
+% 
+% subplot(2,3,4)
+% hold on
+% plot(f4)
+% plot(fce4)
+% % plot(vel4)
+% 
+% subplot(2,3,5)
+% hold on
+% plot(f5)
+% plot(fce5)
+% % plot(vel5)
+% 
+% subplot(2,3,6)
+% hold on
+% plot(f6)
+% plot(fce6)
+% % plot(vel6)
 
 
 %% 

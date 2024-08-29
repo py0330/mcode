@@ -13,13 +13,13 @@ function [Tmax, Tmin] = s_s_curve_Tmax_Tmin(pa, va, pb, vb_max, vc_max, a, j)
 % Tmax：开始时尽可能快的减速，若减速到0，则为inf，否则以到达pb的时间为准
 % Tmin：开始时尽可能快的加速，直到速度最大，之后保持最大速度到终点
 
-cons = eps * 10;
+cons = eps * 10000;
 pt = pb - pa;
 Z1 = a^2/j;
 
 T_va_to_vb = s_acc_time(va,vb_max,a,j);
 l_va_to_vb = T_va_to_vb*(va + vb_max) /2;
-if(va > vb_max && l_va_to_vb > pt)
+if(va > vb_max && l_va_to_vb > pt + cons)
     Tmax=-1;
     Tmin=-1;
     return;
@@ -169,7 +169,7 @@ end
 % 加速不到max_vb, 可以达到最大加速度a
 % va < vb < max_vb, vb - va >= a^2 / j
 l = l_va_to_vb;
-if(pt < l)
+if(va < vb_max && pt < l)
     % clear
     % syms va vb a j pt;
     % T = (vb-va) / a + a/j;

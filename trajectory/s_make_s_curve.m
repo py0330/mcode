@@ -312,7 +312,7 @@ if(pt < l)
 end
 
 % ------------------ l5 --------------------- %
-% vb为0，a段达不到最大加速度，b段可达到最大加速度
+% vb为0，a段可达到最大加速度，b段可达到最大加速度
 %
 % 此时需要满足3个条件：
 % A. Ta + Tb <= T
@@ -565,7 +565,7 @@ Ta_below = max(0, T - 2*a/j);
 l = -1; % 这里为必要条件，因为有可能 vb = v
 if(Ta_upper - Ta_below >= 0)
     Ta = Ta_upper;
-    vc  = va + j*Ta*Ta/4;
+    vc = va + j*Ta*Ta/4;
     Tb = T-Ta;
     vb = max(vc - j*Tb*Tb/4, 0);
     l  = Ta * (va + vc) / 2.0 + Tb * (vb + vc) / 2.0;

@@ -1129,3 +1129,363 @@ v  = v1 + j*T1*T1/4
 T2 = 2 * sqrt((v-v2) / j )
 l = T1 * (v1 + v) / 2 + T2 * (v2 + v) / 2
 
+
+
+%%
+clear
+syms T1 T2 T v1 v2 vc a j pt
+
+T1 = 2 * sqrt((vc-v1)/j)
+T2 = 2 * sqrt((vc-v2)/j)
+
+vc_ans = solve(T1 + T2 == T, vc)
+
+T1 = 2 * sqrt((vc_ans - v1)/j)
+T2 = 2 * sqrt((vc_ans - v2)/j)
+
+collect(T1*(v1+vc_ans) + T2*(v2+vc_ans) - 2*pt, v2)
+
+% solve(Ta*(va+vc_ans) + Tb*(vb+vc_ans) == pt*2, vb)
+
+%%
+clear
+j=5
+a=1
+vb_max=1
+va=0.2
+T=0.95
+
+A = (- (2*((va - vc)/j)^(1/2))/(T^2*j) - (2*((vb - vc)/j)^(1/2))/(T^2*j))
+B = (2*((vb - vc)/j)^(1/2)*((8*j*T^2 + 32*va)/(16*T^2*j) + 1) + ((8*j*T^2 + 32*va)*((va - vc)/j)^(1/2))/(8*T^2*j))
+C = 2*(va - (T^4*j^2 - 8*T^2*j*va + 16*va^2)/(16*T^2*j))*((va - vc)/j)^(1/2) - 2*pt - (((vb - vc)/j)^(1/2)*(T^4*j^2 - 8*T^2*j*va + 16*va^2))/(8*T^2*j)
+
+vb = (-B-sqrt(B*B-4*A*C))/(2*A) 
+vc = (- T^4*j^2 + 8*T^2*j*va + 8*T^2*j*vb - 16*va^2 + 32*va*vb - 16*vb^2)/(16*T^2*j)
+
+
+
+%%
+clear
+syms T1 T2 T v1 v2 vc a j pt
+T1 = 2 * sqrt((vc-v1)/j)
+T2 = 2 * sqrt((vc-v2)/j)
+vc_ans = solve(T1 + T2 == T, vc)
+%%
+clear
+syms T1 T2 T v1 v2 vc a j pt
+T1 = (vc-v1)/a + a/j
+T2 = 2 * sqrt((vc-v2)/j)
+solve(T1 + T2 == T, vc)
+%%
+clear
+syms T1 T2 T v1 v2 vc a j pt
+T1 = (vc-v1)/a + a/j
+T2 = (vc-v2)/a + a/j
+solve(T1 + T2 == T, vc)
+%%
+clear
+syms T1 T2 T v1 v2 vc a j pt
+T1 = 2 * sqrt((v1-vc)/j)
+T2 = 2 * sqrt((v2-vc)/j)
+vc_ans = solve(T1 + T2 == T, vc)
+%%
+clear
+syms T1 T2 T v1 v2 vc a j pt
+T1 = 2 * sqrt((v1-vc)/j)
+T2 = (v2-vc)/a + a/j
+solve(T1 + T2 == T, vc)
+%%
+clear
+syms T1 T2 T v1 v2 vc a j pt
+T1 = (v1-vc)/a + a/j
+T2 = (v2-vc)/a + a/j
+solve(T1 + T2 == T, vc)
+%%
+j=5
+a=1
+vb=0.3
+va=0.2
+T=0.4
+
+[vc,Ta,Tb] = s_cpt_vc_below_by_va_vb_T(va,vb,T,a,j)
+Ta + Tb
+s_acc_time(va,vc,a,j) +s_acc_time(vb,vc,a,j)
+
+[vc,Ta,Tb] = s_cpt_vc_upper_by_va_vb_T(va,vb,T,a,j);
+s_acc_time(va,vc,a,j) + s_acc_time(vb,vc,a,j)
+%%
+syms Ta Tb T va vb vc vb_max a j pa pb
+Ta = (vc-va)/a + a/j
+Tb = (vc-vb)/a + a/j
+
+solve(Ta + Tb == T, vc)
+
+%%
+clear
+syms pt T1 T2 T va vb Ta v1 v2 vc vb_max a j pa pb
+    vc = va - j*Ta*Ta/4
+    la = -j/8*Ta^3 + va*Ta
+    Tb = T-Ta
+    vb = vc + j*Tb*Tb/4
+    lb = Tb*(vc+vb)/2
+    
+collect(la + lb- pt, Ta)
+
+%     solve(la + lb == pt, Ta)
+%%
+clear
+syms va j Ta a T pt
+vc = va - j*Ta*Ta/4
+la = Ta*(va + vc)/2
+Tb = T-Ta
+vb = vc + Tb*a - a^2/j;
+lb = Tb*(vc+vb)/2
+l  = la + lb
+
+collect(l-pt,Ta)
+
+    k3 = j/8;
+    k2 = -(T*j)/4 + a/2;
+    k1 = a^2/(2*j) - T*a;
+    k0 = (T*(-a^2/j + T*a + 2*va))/2 - pt;
+
+    syms f(Ta) g(Ta)
+    f(Ta) = k3*Ta^3 + k2*Ta^2 +k1*Ta + k0
+    g(Ta) = diff(f,Ta)
+    solve(g,Ta)
+
+
+%%
+syms va j Ta a T pt
+vc = va - Ta*a + a*a/j
+la = Ta*(va+vc)/2
+Tb = T-Ta
+vb = vc + j*Tb*Tb/4
+lb = Tb*(vc+vb)/2;
+l  = la+lb
+
+    T1 = 2 * sqrt((v1-vc)/j)
+    T2 = (v2-vc)/a + a/j
+
+collect(l-pt,Ta)
+
+%%
+vc = va + Ta*a - a^2/j;
+la = Ta*(va + vc)/2;
+Tb = T-Ta;
+vb = vc - j*Tb*Tb/4;
+lb = Tb*(v+vb)/2;
+l  = la+lb;
+
+collect(l-pt,Ta)
+
+%%
+    syms va j Ta a T pt
+    vc = va - Ta*a + a*a/j
+    la = Ta*(va+vc)/2
+    Tb = T-Ta
+    vb = vc + j*Tb*Tb/4
+    lb = Tb*(vc+vb)/2;
+
+    collect(la+lb-pt,Ta)
+
+%%
+clear
+syms va j Ta a T pt Tb la vc vc_min
+vb = vc_min + j*Tb*Tb/4
+
+l = Tb*(vb+vc_min)/2 + la + (T-Ta-Tb)*vc_min;
+collect(l, Tb)
+solve(l==pt,Tb)
+
+% k2 = a/2
+% k1 = -a*a/j/2
+% k0 = la - pt
+
+%%
+clear
+syms la vc_max pt Ta Tb T
+vb = vc_max - j*Tb*Tb/4;
+l = la + (T - Ta - Tb)*vc_max + (vc_max + vb)/2*Tb
+solve(l==pt, Tb)
+%     Ta = T_va_to_vcmax;
+%     la = Ta*(va+vc_max)/2;
+%     Tb = max((la + vc_max*(T - Ta) - pt)*8/j,0)^(1/3);
+%     vb = vc_max - j*Tb*Tb/4;
+
+%%
+clear;
+pa = 0;
+pb = 3;
+vb = 1.5;
+va_upper = 1;
+va_below = 0.5;
+vc_max = 5;
+a = 5;
+j=10;
+T=3;
+
+[va,vc] = s_scurve_cpt_vavc(pa, pb, vb, va_upper, va_below, vc_max, a, j, T)
+
+
+if(vc < max(va,vb) && vc >min(va,vb))
+    Tc = s_acc_time(va,vb,a,j);
+    Ta = abs(vc-vb)/abs(vb-va) * (T-Tc);
+    Tb = abs(vc-va)/abs(vb-va) * (T-Tc);
+    l = Ta *va + Tb*vb + (T-Ta-Tb)*(va+vb)/2;
+    l - (pb - pa)
+else
+    Ta = s_acc_time(va,vc,a,j);
+    Tb = s_acc_time(vb,vc,a,j);
+    l = Ta *(va+vc)/2 + Tb*(vb+vc)/2 + (T-Ta-Tb)*vc;
+    l - (pb - pa)
+end
+
+%%
+
+
+
+
+
+%%
+syms va T Tb vb Tb pt
+va = vb + j*Tb*Tb/4
+solve(va * (T-Tb) + (va+vb)/2*Tb - pt,Tb)
+
+%%
+clear;
+syms va vb vc a j T v1 v2
+    T1 = 2 * sqrt((v1-vc)/j)
+    T2 = (v2-vc)/a + a/j
+%     带入条件 A，以下为推导对 vc 的表达式：
+    solve(T1 + T2 == T, vc)
+
+
+        Ta = 2 * sqrt((vc-va)/j)
+    Tb = 2 * sqrt((vc-vb)/j)
+    % 带入条件 Ta + Tb == 0，可得：
+    vc_ans = solve(Ta + Tb == T, vc)
+%%
+clear
+syms Ta la va vc_min pt a j Tb T
+vb = vc_min + a*Tb - a*a/j
+l = Tb*(vb+vc_min)/2  + (T-Ta-Tb)*vc_min + la;
+collect(l, Tb)
+solve(l==pt,Tb)
+
+%%
+clear
+syms T va pt j T a
+vb = va + T*a - a^2/j;
+% vb = va + j*T*T/4;
+l  = T*(vb+va)/2;
+collect(l, T)
+solve(l==pt,T)
+
+
+
+%%
+      clear
+      syms va j Ta a T vc pt
+      vc = va - j*Ta*Ta/4
+      la = j/8*Ta^3 + va*Ta
+      Tb = T-Ta
+      vb = vc + Tb*a - a^2/j;
+      lb = Tb*(vc+vb)/2
+      l  = la + lb
+    k3 = j/4;
+    k2 = (a/2 - (T*j)/8);
+    k1 = (va/2 - vc/2 - T*a + a^2/(2*j));
+    k0 = - pt + (T*(vc + va + T*a - a^2/j))/2;
+collect(la+lb-pt,Ta)
+    syms f(Ta) g(Ta)
+    f(Ta) = k3*Ta^3 + k2*Ta^2 +k1*Ta + k0
+    g(Ta) = diff(f,Ta)
+    solve(g,Ta)
+%%
+    syms va j Ta a T pt
+    vc = va - Ta*a + a*a/j
+    la = Ta*(va+vc)/2
+    Tb = T-Ta
+    vb = vc + Tb*a - a*a/j
+    lb = Tb*(vc+vb)/2;
+    
+    collect(la+lb-pt,Ta)
+    %%
+    syms a j T va Ta Tb pt
+    vc = va - j*Ta*Ta/4
+    la = Ta*(va+vc)/2
+    Tb = T-Ta
+    vb = vc + j*Tb*Tb/4
+    lb = Tb*(vc+vb)/2
+    collect(la+lb-pt,Ta)
+    %%
+      clear
+      syms va j Ta a T pt
+      vc = va + j*Ta*Ta/4
+      la = Ta*(vc+va)/2
+      Tb = T-Ta
+      vb = vc - Tb*a + a^2/j;
+      lb = Tb*(vc+vb)/2
+      l  = la + lb
+    collect(la+lb-pt,Ta)
+    %%
+    clear
+    syms va T a j pt Ta
+    vc = va - Ta*a + a^2/j
+    la = Ta*(va + vc)/2
+    Tb = T-Ta
+    vb = vc + j*Tb*Tb/4;
+    lb = Tb*(vc + vb)/2
+    collect(la+lb-pt,Ta)
+%%
+clear
+syms va T a j pt Ta
+vc = va - Ta * a + a ^ 2 / j
+la = Ta * (va + vc) / 2
+Tb = T - Ta
+vb = vc + j * Tb * Tb / 4;
+lb = Tb * (vc + vb) / 2
+collect(la + lb - pt, Ta)
+
+syms f(Ta) g(Ta)
+f(Ta) = la + lb - pt
+g(Ta) = diff(f, Ta)
+solve(g, Ta)
+
+% k3 = -j / 8
+% k2 = (a / 2 + (3 * T * j) / 8)
+% k1 = (-(T ^ 2 * j) / 8 - a ^ 2 / (2 * j) - (T * (2 * a + (T * j) / 2)) / 2)
+% k0 = -pt + (T * (2 * va + (T ^ 2 * j) / 4 + (2 * a ^ 2) / j)) / 2
+%%
+clear
+syms va T a j pt Ta
+vb = - a^2/j + va
+t = (va-vb)/a+a/j
+l = t*(va+vb)/2 
+
+%%
+clear
+syms va T a j pt Ta vb
+
+t = 2 * sqrt( (va-vb) / j )
+l = t*(va+vb)/2
+l^2-pt^2
+
+collect(l^2-pt^2, vb)
+% collect(la + lb - pt, Ta)
+
+f(vb) = l^2-pt^2;
+
+g(vb) = diff(f, vb)
+
+solve(g==0,vb)
+%%
+syms va T a j pt Ta vb
+t = (va-vb)/a+a/j;
+l = t*(va+vb)/2
+f(vb) = l-pt;
+
+g(vb) = diff(f, vb)
+
+solve(g==0,vb)
